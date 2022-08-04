@@ -1,0 +1,6 @@
+notes.md
+__pycache__
+
+keep json for ease of integration and because in ethereum this is the standard
+
+keep compressed format
