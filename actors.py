@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 from bls import PublicKey
 from keypair import KeyPair
-from srs import SRS, SRSParameters
+from srs import SERIALISED_SRS, SRS, SRSParameters
 from srs_updates import UpdateProof
 
 
@@ -18,7 +18,7 @@ class Contributor:
     # _after_ they have added their contribution.
     old_srs: Optional[SRS]
 
-    def __init__(self, keypair: KeyPair, parameters: SRSParameters, serialised_srs: bytes):
+    def __init__(self, keypair: KeyPair, parameters: SRSParameters, serialised_srs: SERIALISED_SRS):
         self.srs = SRS.deserialise(parameters, serialised_srs)
         # Copy the old SRS because when we update the SRS, it overwrites it
         # We check the SRS after updating
@@ -46,7 +46,7 @@ class Coordinator:
     current_SRS: SRS
     update_proofs: List[UpdateProof] = []
 
-    def replace_current_srs(self, serialised_srs: bytes, update_proof: UpdateProof):
+    def replace_current_srs(self, serialised_srs: SERIALISED_SRS, update_proof: UpdateProof):
 
         received_srs = SRS.deserialise(self.parameters, serialised_srs)
 

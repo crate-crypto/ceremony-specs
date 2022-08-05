@@ -10,6 +10,8 @@ from common import pairwise
 from keypair import KeyPair
 from srs_updates import UpdateProof
 
+SERIALISED_SRS = bytes
+
 
 @dataclass
 class SRSParameters:
@@ -122,10 +124,10 @@ class SRS:
 
         return bytes(serialised_srs)
 
-    def serialise(self):
+    def serialise(self) -> SERIALISED_SRS:
         return self.to_bytes()
 
-    def deserialise(param: SRSParameters, serialised_srs: bytes):
+    def deserialise(param: SRSParameters, serialised_srs: SERIALISED_SRS):
         return SRS.from_bytes(param, serialised_srs)
 
     # Check if the SRS passes our correctness checks:
