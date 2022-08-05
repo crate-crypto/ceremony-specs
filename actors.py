@@ -54,7 +54,7 @@ class Coordinator:
     def replace_current_srs(self, serialised_srs: SERIALISED_SRS, update_proof: UpdateProof):
 
         parameters = SRSParameters(
-            self.current_SRS.num_g1_points, self.current_SRS.num_g2_points)
+            self.current_SRS.num_g1_points(), self.current_SRS.num_g2_points())
 
         received_srs = SRS.deserialise(parameters, serialised_srs)
         if SRS.verify_updates(self.current_SRS, received_srs, [update_proof]) == False:

@@ -41,9 +41,6 @@ class SRSParameters:
 # than the time to decompress the compressed form.
 @dataclass
 class SRS:
-    num_g1_points: int
-    num_g2_points: int
-
     g1_points: List[G1Point]
     g2_points: List[G2Point]
 
@@ -56,25 +53,32 @@ class SRS:
             self.g1_points = [param.starting_g1] * param.num_g1_points_needed
             self.g2_points = [param.starting_g2] * param.num_g2_points_needed
         else:
+            assert len(_g1_points) == param.num_g1_points_needed
+            assert len(_g2_points) == param.num_g2_points_needed
+
             # Initialise the SRS from the provided g1 ad g2 points
             self.g1_points = _g1_points
             self.g2_points = _g2_points
 
-        self.num_g1_points = param.num_g1_points_needed
-        self.num_g2_points = param.num_g2_points_needed
+    def num_g1_points(self):
+        return len(self.g1_points)
+
+    def num_g2_points(self):
+        return len(self.g2_points)
 
     # Update the SRS using a private key and produce an update proof
     def update(self, keypair: KeyPair):
+        num_g1_points = len(self.g1_points)
+        num_g2_points = len(self.g2_points)
 
         private_key = keypair.private_key
-
         before_degree_1_point = self.degree_1_g1()
 
-        for i in range(self.num_g1_points):
+        for i in range(num_g1_points):
             priv_key_i = private_key.pow_i(i)
             self.g1_points[i] = multiply_g1(self.g1_points[i], priv_key_i)
 
-        for i in range(self.num_g2_points):
+        for i in range(num_g2_points):
             priv_key_i = private_key.pow_i(i)
             self.g2_points[i] = multiply_g2(self.g2_points[i], priv_key_i)
 
