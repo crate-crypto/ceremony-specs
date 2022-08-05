@@ -71,6 +71,7 @@ class TestSRS(unittest.TestCase):
 
         serialised_srs = srs.serialise()
         deserialised_srs = SRS.deserialise(params, serialised_srs)
+        self.assertIsNotNone(deserialised_srs)
 
         # Check that the sizes are the same
         self.assertEqual(len(srs.g1_points), len(deserialised_srs.g1_points))
