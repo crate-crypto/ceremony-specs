@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from bls import G1Point, G2Point, is_identity, pairing, G2Generator
+from bls import G1Point, G2Point, gt_eq, is_identity, pairing, G2Generator
 from common import pairwise
 
 
@@ -35,6 +35,6 @@ class ProductDecompositionProof:
             p1 = pairing(next_running_product, G2Generator)
             p2 = pairing(prev_running_product, witness)
 
-            if p1 != p2:
+            if gt_eq(p1, p2) == False:
                 return False
         return True
