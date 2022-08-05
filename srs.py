@@ -91,46 +91,6 @@ class SRS:
     def copy(self):
         return deepcopy(self)
 
-    # Initialise the SRS from a previous SRS.
-    # This is used by participants in the ceremony, while the ceremony is ongoing
-    def from_bytes(param: SRSParameters, serialised_srs: bytes) -> SRS:
-        # Serialised SRS should contain the g1 points and g2 points in decompressed form
-        # The g1 points will come first and g2 points after.
-        # The number of g1/g2 points is not encoded in the file because for all
-        # sizes that we care about, all g1/g2 points can be placed in one file.
-        buffer = io.BytesIO(serialised_srs)
-
-        g1_points = []
-        g2_points = []
-
-        for _ in range(param.num_g1_points_needed):
-            serialised_point = buffer.read(SERIALISED_G1_BYTES_SIZE)
-            point = compressed_bytes_to_g1(serialised_point)
-            g1_points.append(point)
-
-        for i in range(param.num_g2_points_needed):
-            serialised_point = buffer.read(SERIALISED_G2_BYTES_SIZE)
-            point = compressed_bytes_to_g2(serialised_point)
-            g2_points.append(point)
-
-        # Check that there is nothing else in the buffer
-        assert len(buffer.read()) == 0
-
-        return SRS(param, g1_points, g2_points)
-
-    # Serialises all points in the SRS in compressed form
-    def to_bytes(self) -> bytes:
-        serialised_srs = bytearray()
-        for point in self.g1_points:
-            point_as_bytes = compressed_g1_to_bytes(point)
-            serialised_srs.extend(point_as_bytes)
-
-        for point in self.g2_points:
-            point_as_bytes = compressed_g2_to_bytes(point)
-            serialised_srs.extend(point_as_bytes)
-
-        return bytes(serialised_srs)
-
     def from_hex_strings(param: SRSParameters, serialised_srs: Tuple[G1Powers, G2Powers]) -> SRS:
         g1_points = []
         g2_points = []
