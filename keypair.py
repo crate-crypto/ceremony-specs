@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+from typing import Union
 from bls import PrivateKey, PublicKey
+from common import hex_str
 
 
 @dataclass
@@ -7,11 +9,16 @@ class KeyPair:
     private_key: PrivateKey
     public_key: PublicKey
 
-    def __init__(self, secret: int) -> None:
-        private_key = PrivateKey(secret)
+    def __init__(self, secret: Union[int, hex_str]) -> None:
+        if isinstance(secret, int):
+            self.private_key = PrivateKey(secret)
+        elif isinstance(secret, hex_str):
+            secret_as_int = int(secret, 16)
+            self.private_key = PrivateKey(secret_as_int)
+        else:
+            raise TypeError("type is not an integer or a hexadecimal string")
 
-        self.public_key = private_key.to_public_key()
-        self.private_key = private_key
+        self.public_key = self.private_key.to_public_key()
 
     def destroy(self):
         # Once the KeyPair is no longer needed, it is important that the user deletes the private key.
