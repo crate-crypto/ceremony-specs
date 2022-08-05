@@ -13,7 +13,14 @@ from srs_updates import UpdateProof, UpdateProofs
 G1Powers = List[hex_str]
 G2Powers = List[hex_str]
 
-SERIALISED_SRS = Tuple[G1Powers, G2Powers]
+
+@dataclass
+class SERIALISED_SRS:
+    num_g1_points: int
+    num_g2_points: int
+
+    g1_points: G1Powers
+    g2_points: G2Powers
 
 
 @dataclass
@@ -132,10 +139,19 @@ class SRS:
         return [g1_powers, g2_powers]
 
     def serialise(self) -> SERIALISED_SRS:
-        return self.to_hex_strings()
+        num_g1_points = self.num_g1_points()
+        num_g2_points = self.num_g2_points()
+        g1_powers, g2_powers = self.to_hex_strings()
+
+        return SERIALISED_SRS(num_g1_points, num_g2_points, g1_powers, g2_powers)
 
     def deserialise(param: SRSParameters, serialised_srs: SERIALISED_SRS):
-        return SRS.from_hex_strings(param, serialised_srs)
+        if param.num_g1_points_needed != serialised_srs.num_g1_points:
+            return None
+        if param.num_g2_points_needed != serialised_srs.num_g2_points:
+            return None
+        powers = [serialised_srs.g1_points, serialised_srs.g2_points]
+        return SRS.from_hex_strings(param, powers)
 
     # Check if the SRS passes our correctness checks:
     # - The first element should not be the identity point
