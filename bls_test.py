@@ -1,7 +1,5 @@
 import unittest
 from bls import G1Generator, G2Generator, compressed_g1_to_bytes, compressed_g2_to_bytes
-from keypair import KeyPair
-from srs import SRS, SRSParameters
 
 
 class TestSRS(unittest.TestCase):
