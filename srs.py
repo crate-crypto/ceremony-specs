@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 from copy import deepcopy
 import io
 
@@ -10,7 +10,14 @@ from common import pairwise
 from keypair import KeyPair
 from srs_updates import UpdateProof
 
-SERIALISED_SRS = bytes
+# A hexadecimal string, without `0x` prepending it
+# TODO: Check if prepending 0x aligns with the specs
+hex_str = str
+
+G1Powers = List[hex_str]
+G2Powers = List[hex_str]
+
+SERIALISED_SRS = Tuple[G1Powers, G2Powers]
 
 
 @dataclass
@@ -111,7 +118,7 @@ class SRS:
 
         return SRS(param, g1_points, g2_points)
 
-    # Serialises all points in the SRS in uncompressed form
+    # Serialises all points in the SRS in compressed form
     def to_bytes(self) -> bytes:
         serialised_srs = bytearray()
         for point in self.g1_points:
@@ -123,6 +130,41 @@ class SRS:
             serialised_srs.extend(point_as_bytes)
 
         return bytes(serialised_srs)
+
+    def from_hex_strings(param: SRSParameters, serialised_srs: Tuple[G1Powers, G2Powers]) -> SRS:
+        g1_points = []
+        g2_points = []
+
+        g1_powers, g2_powers = serialised_srs
+
+        for i in range(param.num_g1_points_needed):
+            serialised_point = bytes.fromhex(g1_powers[i])
+            point = compressed_bytes_to_g1(serialised_point)
+            g1_points.append(point)
+
+        for i in range(param.num_g2_points_needed):
+            serialised_point = bytes.fromhex(g2_powers[i])
+            point = compressed_bytes_to_g2(serialised_point)
+            g2_points.append(point)
+
+        # Check that we were given the exact amount of powers needed
+        # This is placed to catch bugs, where the serialised_srs
+        # is unknowingly larger than the parameters needed.
+        assert len(g1_powers) == len(g1_points)
+        assert len(g2_powers) == len(g2_points)
+
+        return SRS(param, g1_points, g2_points)
+
+    def to_hex_strings(self) -> Tuple[G1Powers, G2Powers]:
+        g1_powers = []
+        g2_powers = []
+        for point in self.g1_points:
+            hex_str = compressed_g1_to_bytes(point).hex()
+            g1_powers.append(hex_str)
+        for point in self.g2_points:
+            hex_str = compressed_g2_to_bytes(point).hex()
+            g2_powers.append(hex_str)
+        return [g1_powers, g2_powers]
 
     def serialise(self) -> SERIALISED_SRS:
         return self.to_bytes()
