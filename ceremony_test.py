@@ -49,7 +49,7 @@ class TestSimpleCeremony(unittest.TestCase):
             serialised_srs_updated = contributor.serialise_srs()
 
             self.assertEqual(proof.after_degree_1_point,
-                             contributor.srs.degree_1_g1())
+                             contributor.srs.__degree_1_g1())
 
             # Coordinator checks the SRS received. Replaces their old SRS
             # with the one received from the coordinator, if it passes

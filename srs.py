@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from typing import List, Tuple
 from copy import deepcopy
 
-from bls import (G1Point, G2Point, g1_eq, gt_eq, is_identity, is_in_subgroup,  multiply_g1, multiply_g2, pairing,
-                 compressed_bytes_to_g1, compressed_bytes_to_g2, compressed_g1_to_bytes, compressed_g2_to_bytes, G1Generator, G2Generator)
-from common import bytes_to_hex, pairwise, hex_str, bytes_from_hex
+from bls import (G1Point, G2Point, g1_eq, g1_to_hex_str, g2_to_hex_str, gt_eq, hex_str_to_g1, hex_str_to_g2, is_identity, is_in_subgroup,  multiply_g1, multiply_g2, pairing,
+                 G1Generator, G2Generator)
+from common import pairwise, hex_str
 from keypair import KeyPair
 from srs_updates import UpdateProof, UpdateProofs
 
@@ -79,7 +79,7 @@ class SRS:
         num_g2_points = len(self.g2_points)
 
         private_key = keypair.private_key
-        before_degree_1_point = self.degree_1_g1()
+        before_degree_1_point = self.__degree_1_g1()
 
         for i in range(num_g1_points):
             priv_key_i = private_key.pow_i(i)
@@ -89,7 +89,7 @@ class SRS:
             priv_key_i = private_key.pow_i(i)
             self.g2_points[i] = multiply_g2(self.g2_points[i], priv_key_i)
 
-        after_degree_1_point = self.degree_1_g1()
+        after_degree_1_point = self.__degree_1_g1()
 
         return UpdateProof(keypair.public_key, before_degree_1_point,
                            after_degree_1_point)
@@ -120,13 +120,11 @@ class SRS:
         g1_powers, g2_powers = serialised_srs
 
         for i in range(param.num_g1_points_needed):
-            serialised_point = bytes_from_hex(g1_powers[i])
-            point = compressed_bytes_to_g1(serialised_point)
+            point = hex_str_to_g1(g1_powers[i])
             g1_points.append(point)
 
         for i in range(param.num_g2_points_needed):
-            serialised_point = bytes_from_hex(g2_powers[i])
-            point = compressed_bytes_to_g2(serialised_point)
+            point = hex_str_to_g2(g2_powers[i])
             g2_points.append(point)
 
         # Check that we were given the exact amount of powers needed
@@ -142,11 +140,9 @@ class SRS:
         g2_powers = []
 
         for point in self.g1_points:
-            hex_str = bytes_to_hex(compressed_g1_to_bytes(point))
-            g1_powers.append(hex_str)
+            g1_powers.append(g1_to_hex_str(point))
         for point in self.g2_points:
-            hex_str = bytes_to_hex(compressed_g2_to_bytes(point))
-            g2_powers.append(hex_str)
+            g2_powers.append(g2_to_hex_str(point))
 
         return [g1_powers, g2_powers]
 
@@ -199,9 +195,9 @@ class SRS:
         first_update = update_proofs[0]
         last_update = update_proofs[-1]
 
-        if g1_eq(before_srs.degree_1_g1(), first_update.before_degree_1_point) == False:
+        if g1_eq(before_srs.__degree_1_g1(), first_update.before_degree_1_point) == False:
             return False
-        if g1_eq(after_srs.degree_1_g1(), last_update.after_degree_1_point) == False:
+        if g1_eq(after_srs.__degree_1_g1(), last_update.after_degree_1_point) == False:
             return False
 
         # 2) Check that the update proofs are correctly linked together
