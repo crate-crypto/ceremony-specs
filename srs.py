@@ -167,10 +167,10 @@ class SRS:
         return [g1_powers, g2_powers]
 
     def serialise(self) -> SERIALISED_SRS:
-        return self.to_bytes()
+        return self.to_hex_strings()
 
     def deserialise(param: SRSParameters, serialised_srs: SERIALISED_SRS):
-        return SRS.from_bytes(param, serialised_srs)
+        return SRS.from_hex_strings(param, serialised_srs)
 
     # Check if the SRS passes our correctness checks:
     # - The first element should not be the identity point
