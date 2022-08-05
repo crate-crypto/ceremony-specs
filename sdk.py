@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 from actors import Contributor, Verifier
 from bls import PublicKey
 from keypair import KeyPair
-from srs import SRS, G1Powers, G2Powers, SRSParameters
+from srs import SRS, SRSParameters, SerialisedSRS
 from srs_updates import UpdateProof, UpdateProofs
 from common import hex_str
 
@@ -11,25 +11,19 @@ from common import hex_str
 # We are running four small ceremonies each of a different size
 NUM_OF_CEREMONIES = 4
 
-# Constants represent the number of G1 powers
-# needed for each ceremony
-CEREMONY_1_NUM_G1_POWERS = 4096  # 2^12
-CEREMONY_2_NUM_G1_POWERS = 8192  # 2^13
-CEREMONY_3_NUM_G1_POWERS = 16384  # 2^14
-CEREMONY_4_NUM_G1_POWERS = 32768  # 2^15
-
 # All ceremonies require the same number of G2 points
 CEREMONY_NUM_G2_POWERS = 65
 
-NUM_G1_POWERS_NEEDED = [CEREMONY_1_NUM_G1_POWERS, CEREMONY_2_NUM_G1_POWERS,
-                        CEREMONY_3_NUM_G1_POWERS, CEREMONY_4_NUM_G1_POWERS]
+CEREMONY_1_PARAMS = SRSParameters(4096, CEREMONY_NUM_G2_POWERS)  # 2^12
+CEREMONY_2_PARAMS = SRSParameters(8192, CEREMONY_NUM_G2_POWERS)  # 2^13
+CEREMONY_3_PARAMS = SRSParameters(16384, CEREMONY_NUM_G2_POWERS)  # 2^14
+CEREMONY_4_PARAMS = SRSParameters(32768, CEREMONY_NUM_G2_POWERS)  # 2^15
+
+TRANSCRIPT_PARAMS = [CEREMONY_1_PARAMS, CEREMONY_2_PARAMS,
+                     CEREMONY_3_PARAMS, CEREMONY_4_PARAMS]
 
 
-@dataclass
-class Ceremony:
-    num_g1_powers: int
-    num_g2_powers: int
-    powers_of_tau: Tuple[G1Powers, G2Powers]
+Ceremony = SerialisedSRS
 
 
 @dataclass
@@ -64,14 +58,12 @@ def update_transcript(transcript: Transcript, secrets: List[hex_str]) -> Tuple[T
 
     # Emulate four Contributors, one for each ceremony
     contributors: List[Contributor] = []
-    for (keypair, ceremony, num_g1_powers) in zip(keypairs, transcript.sub_ceremonies, NUM_G1_POWERS_NEEDED):
+    for (keypair, ceremony, params) in zip(keypairs, transcript.sub_ceremonies, TRANSCRIPT_PARAMS):
 
-        assert ceremony.num_g1_powers == num_g1_powers
-        assert ceremony.num_g2_powers == CEREMONY_NUM_G2_POWERS
+        assert ceremony.num_g1_powers == params.num_g1_points_needed
+        assert ceremony.num_g2_powers == params.num_g2_points_needed
 
-        params = SRSParameters(ceremony.num_g1_powers, ceremony.num_g2_powers)
-
-        contributor = Contributor(keypair, params, ceremony.powers_of_tau)
+        contributor = Contributor(keypair, params, ceremony)
         contributors.append(contributor)
 
     # Update SRS's with contribution and return the update proofs
