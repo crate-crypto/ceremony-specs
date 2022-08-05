@@ -1,5 +1,5 @@
 import unittest
-from bls import is_identity, uncompressed_g1_to_bytes, uncompressed_g2_to_bytes
+from bls import is_identity, compressed_g1_to_bytes, compressed_g2_to_bytes
 from keypair import KeyPair
 from srs import SRS, SRSParameters
 
@@ -77,12 +77,12 @@ class TestSRS(unittest.TestCase):
         self.assertEqual(len(srs.g2_points), len(deserialised_srs.g2_points))
 
         for point, des_point in zip(srs.g1_points, deserialised_srs.g1_points):
-            self.assertEqual(uncompressed_g1_to_bytes(point),
-                             uncompressed_g1_to_bytes(des_point))
+            self.assertEqual(compressed_g1_to_bytes(point),
+                             compressed_g1_to_bytes(des_point))
 
         for point, des_point in zip(srs.g2_points, deserialised_srs.g2_points):
-            self.assertEqual(uncompressed_g2_to_bytes(point),
-                             uncompressed_g2_to_bytes(des_point))
+            self.assertEqual(compressed_g2_to_bytes(point),
+                             compressed_g2_to_bytes(des_point))
 
 
 if __name__ == '__main__':

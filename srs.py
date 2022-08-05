@@ -5,7 +5,7 @@ from copy import deepcopy
 import io
 
 from bls import (SERIALISED_G1_BYTES_SIZE, SERIALISED_G2_BYTES_SIZE, G1Point, G2Point, is_identity, is_in_subgroup,  multiply_g1, multiply_g2, pairing,
-                 uncompressed_bytes_to_g1, uncompressed_bytes_to_g2, uncompressed_g1_to_bytes, uncompressed_g2_to_bytes, G1Generator, G2Generator)
+                 compressed_bytes_to_g1, compressed_bytes_to_g2, compressed_g1_to_bytes, compressed_g2_to_bytes, G1Generator, G2Generator)
 from common import pairwise
 from keypair import KeyPair
 from srs_updates import UpdateProof
@@ -32,10 +32,8 @@ class SRSParameters:
 
 
 # The SRS also known as an accumulator, is that gets passed and modified between each participant
-# We serialise it in decompressed form because the ceremony is small enough that the file size will remain
-# small.
-# As an upper bound, assume we have 2^16 points. Each point is 96 bytes for bls12-381.
-# We therefore get a total file size of ~6M
+# We serialise it in compressed form because we care more about the size of the file,
+# than the time to decompress the compressed form.
 @dataclass
 class SRS:
     g1_points: List[G1Point]
@@ -98,12 +96,12 @@ class SRS:
 
         for _ in range(param.num_g1_points_needed):
             serialised_point = buffer.read(SERIALISED_G1_BYTES_SIZE)
-            point = uncompressed_bytes_to_g1(serialised_point)
+            point = compressed_bytes_to_g1(serialised_point)
             g1_points.append(point)
 
         for i in range(param.num_g2_points_needed):
             serialised_point = buffer.read(SERIALISED_G2_BYTES_SIZE)
-            point = uncompressed_bytes_to_g2(serialised_point)
+            point = compressed_bytes_to_g2(serialised_point)
             g2_points.append(point)
 
         # Check that there is nothing else in the buffer
@@ -115,11 +113,11 @@ class SRS:
     def to_bytes(self) -> bytes:
         serialised_srs = bytearray()
         for point in self.g1_points:
-            point_as_bytes = uncompressed_g1_to_bytes(point)
+            point_as_bytes = compressed_g1_to_bytes(point)
             serialised_srs.extend(point_as_bytes)
 
         for point in self.g2_points:
-            point_as_bytes = uncompressed_g2_to_bytes(point)
+            point_as_bytes = compressed_g2_to_bytes(point)
             serialised_srs.extend(point_as_bytes)
 
         return bytes(serialised_srs)
@@ -127,8 +125,8 @@ class SRS:
     def serialise(self):
         return self.to_bytes()
 
-    def deserialise(self):
-        return self.from_bytes()
+    def deserialise(param: SRSParameters, serialised_srs: bytes):
+        return SRS.from_bytes(param, serialised_srs)
 
     # Check if the SRS passes our correctness checks:
     # - The first element should not be the identity point

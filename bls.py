@@ -19,11 +19,13 @@ G2Point = Optional[Tuple[FQ2, FQ2, FQ2]]
 G1Generator = G1Generator
 G2Generator = G2Generator
 
+compressed_bytes_to_g1 = compressed_bytes_to_g1
+compressed_g1_to_bytes = compressed_g1_to_bytes
+compressed_bytes_to_g2 = compressed_bytes_to_g2
+compressed_g2_to_bytes = compressed_g2_to_bytes
+
 # When we serialise a G1 or G2 points, these constants represent
 # their serialised size
-#
-# These will change in the future.
-# We want to serialise the points in their uncompressed form
 SERIALISED_G1_BYTES_SIZE = 48
 SERIALISED_G2_BYTES_SIZE = 96
 
@@ -51,41 +53,6 @@ def multiply_g1(point: G1Point, private_key: PrivateKey):
 
 def multiply_g2(point: G2Point, private_key: PrivateKey):
     return multiply(point, private_key.scalar)
-
-
-def uncompressed_g1_to_bytes(point: G1Point):
-    # TODO: py_ecc does not have the uncompressed serialisation versions
-    # So for now, we use the compressed version
-    byts = compressed_g1_to_bytes(point)
-
-    assert len(byts) == SERIALISED_G1_BYTES_SIZE
-
-    return byts
-
-
-def uncompressed_bytes_to_g1(byts: bytes):
-    # TODO: py_ecc does not have the uncompressed serialisation versions
-    # So for now, we use the compressed version
-    #
-    # This method is also doing a subgroup check.
-    # We do not want this here, one reason being that its done naively and is therefore slow
-    # The other is that we want to optimistically contribute and then verify check after
-    return compressed_bytes_to_g1(byts)
-
-
-def uncompressed_g2_to_bytes(point: G2Point):
-    # TODO: See comment in `uncompressed_g1_to_bytes`
-
-    byts = compressed_g2_to_bytes(point)
-
-    assert len(byts) == SERIALISED_G2_BYTES_SIZE
-
-    return byts
-
-
-def uncompressed_bytes_to_g2(byts: bytes):
-    # TODO: See comment in `uncompressed_bytes_to_g1`
-    return compressed_bytes_to_g2(byts)
 
 
 @ dataclass
@@ -123,68 +90,3 @@ class PublicKey:
     # why compressed form was chosen. For code uniformity, we can use uncompressed form
     def to_bytes(self) -> bytes:
         return compressed_g2_to_bytes(self.point)
-
-# from abc import ABC, abstractmethod
-        # class PairingGroup(ABC):
-        #     @abstractmethod
-        #     def scalar_multiply(self, n, element):
-        #         """
-        #         Adds a group element to itself `n` times
-
-        #         Args:
-        #             n (Field): A field element
-        #             rhs (Group): A group element
-        #         """
-        #         pass
-
-        #     @abstractmethod
-        #     def pairing(self, lhs, rhs):
-        #         """
-        #         Returns the pairing of two elements
-        #         Args:
-        #             lhs (G1point): A group element
-        #             rhs (G2Point): A group element
-        #         """
-        #         pass
-
-        #     @abstractmethod
-        #     def identity(self):
-        #         """
-        #         Returns the identity for the group
-        #         """
-        #         pass
-
-        #     # @abstractmethod
-        #     # def order(self):
-        #     #     """
-        #     #     Returns the order of the group
-        #     #     """
-        #     #     pass
-
-        #     @abstractmethod
-        #     def generator(self):
-        #         """
-        #         Returns a generator for the largest prime subgroup of the group
-        #         """
-        #         pass
-
-        #     @abstractmethod
-        #     def serialise(self):
-        #         """
-        #         Returns a byte string encoding of the group
-        #         """
-        #         pass
-
-        #     @abstractmethod
-        #     def deserialise(self):
-        #         """
-        #         Returns a byte string encoding of the group
-        #         """
-        #         pass
-
-        #     @abstractmethod
-        #     def in_group(self):
-        #         """
-        #         Returns true if the element is in the group
-        #         """
-        #         pass
