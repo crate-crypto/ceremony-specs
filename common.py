@@ -6,8 +6,17 @@ def pairwise(seq):
         yield (seq[i: i + window_size])
 
 
-# A hexadecimal string, without `0x` prepending it
+# A hexadecimal string, `0x` prepending it
+# The reason why the specs needs it is because of:https://ethereum.org/en/developers/docs/apis/json-rpc/#unformatted-data-encoding
 hex_str = str
-# TODO: This doesn't match the specs. The Json file has prepended 0x
-# TODO: Internally in the cryptography, we do not use 0x, though when we give it to the frontend
-# TODO we need to add it. The reason why the specs needs it is because of:https://ethereum.org/en/developers/docs/apis/json-rpc/#unformatted-data-encoding
+
+
+def bytes_from_hex(hex_str: hex_str):
+    if hex_str.startswith("0x"):
+        # Skip the first two characters
+        return bytes.fromhex(hex_str[2:])
+    return bytes.fromhex(hex_str)
+
+
+def bytes_to_hex(byts: bytes):
+    return "0x" + byts.hex()
