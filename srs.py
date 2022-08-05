@@ -94,9 +94,21 @@ class SRS:
         return UpdateProof(keypair.public_key, before_degree_1_point,
                            after_degree_1_point)
 
+    # Returns the G1 degree 0 element of the SRS
+    def __degree_0_g1(self):
+        return deepcopy(self.g1_points[0])
+
     # Returns the G1 degree 1 element of the SRS
-    def degree_1_g1(self):
+    def __degree_1_g1(self):
         return deepcopy(self.g1_points[1])
+
+    # Returns the G2 degree 0 element of the SRS
+    def __degree_0_g2(self):
+        return deepcopy(self.g2_points[0])
+
+    # Returns the G2 degree 1 element of the SRS
+    def __degree_1_g2(self):
+        return deepcopy(self.g2_points[1])
 
     def copy(self):
         return deepcopy(self)
@@ -208,11 +220,11 @@ class SRS:
     # Check that each subsequent element of the SRS increases the degree by 1
     # ie the SRS has the correct structure
     def structure_check(self):
-        tau_0_g1 = self.g1_points[0]
-        tau_1_g1 = self.g1_points[1]
+        tau_0_g1 = self.__degree_0_g1()
+        tau_1_g1 = self.__degree_1_g1()
 
-        tau_0_g2 = self.g2_points[0]
-        tau_1_g2 = self.g2_points[1]
+        tau_0_g2 = self.__degree_0_g2()
+        tau_1_g2 = self.__degree_1_g2()
 
         # G1 structure check
         power_pairs = pairwise(self.g1_points)
