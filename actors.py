@@ -14,8 +14,8 @@ class Contributor:
     keypair: KeyPair
     srs: SRS
     # The contributor keeps two SRS's in memory because they will
-    # do the subgroup checks on the SRS they received from the contributor
-    # after they have added their contribution.
+    # do the subgroup checks on the SRS they received from the co-ordinator
+    # _after_ they have added their contribution.
     old_srs: Optional[SRS]
 
     def __init__(self, keypair: KeyPair, parameters: SRSParameters, serialised_srs: bytes):
