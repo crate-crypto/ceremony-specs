@@ -11,7 +11,7 @@ from py_ecc.bls.g2_primatives import (G1_to_pubkey as compressed_g1_to_bytes,
 
 # Types are aliased and specialised from py_ecc
 # so that the methods work as expected
-# `Point2D` does not seem to be exposed in the public public API.
+# Need this because `Point2D` does not seem to be exposed in the public public API.
 # None signifies the identity point
 G1Point = Optional[Tuple[FQ, FQ, FQ]]
 G2Point = Optional[Tuple[FQ2, FQ2, FQ2]]
