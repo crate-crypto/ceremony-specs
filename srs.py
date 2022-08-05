@@ -124,6 +124,12 @@ class SRS:
 
         return bytes(serialised_srs)
 
+    def serialise(self):
+        return self.to_bytes()
+
+    def deserialise(self):
+        return self.from_bytes()
+
     # Check if the SRS passes our correctness checks:
     # - The first element should not be the identity point
     # - The elements in the SRS should not have a low order component
@@ -136,12 +142,8 @@ class SRS:
             return False
 
         # 2) Check that each element is in the correct subgroup
-        for point in self.g1_points:
-            if is_in_subgroup(point) == False:
-                return False
-        for point in self.g2_points:
-            if is_in_subgroup(point) == False:
-                return False
+        if self.subgroup_checks() == False:
+            return False
 
         # 3) structural check
         return self.structure_check()
@@ -206,6 +208,16 @@ class SRS:
             p2 = pairing(tau_1_g1, tau_i)
 
             if p1 != p2:
+                return False
+
+        return True
+
+    def subgroup_checks(self):
+        for point in self.g1_points:
+            if is_in_subgroup(point) == False:
+                return False
+        for point in self.g2_points:
+            if is_in_subgroup(point) == False:
                 return False
 
         return True

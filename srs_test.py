@@ -69,8 +69,8 @@ class TestSRS(unittest.TestCase):
 
         srs.update(KeyPair(2))
 
-        serialised_srs = srs.to_bytes()
-        deserialised_srs = SRS.from_bytes(params, serialised_srs)
+        serialised_srs = srs.serialise()
+        deserialised_srs = SRS.deserialise(params, serialised_srs)
 
         # Check that the sizes are the same
         self.assertEqual(len(srs.g1_points), len(deserialised_srs.g1_points))
