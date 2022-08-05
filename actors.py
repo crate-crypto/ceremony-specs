@@ -98,6 +98,6 @@ class Verifier:
         num_updates = len(update_proofs)
         for i in range(num_updates):
             proof = update_proofs[i]
-            if g2_eq(key, proof.public_key):
+            if g2_eq(key.point, proof.public_key.point):
                 return i
         return None
