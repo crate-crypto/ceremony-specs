@@ -8,6 +8,7 @@ from py_ecc.optimized_bls12_381 import (
     G1 as G1Generator, G2 as G2Generator, FQ, FQ2, FQ12, curve_order, multiply, is_inf, is_on_curve, optimized_pairing, eq)
 from py_ecc.bls.g2_primatives import (G1_to_pubkey as compressed_g1_to_bytes,
                                       pubkey_to_G1 as compressed_bytes_to_g1, G2_to_signature as compressed_g2_to_bytes, signature_to_G2 as compressed_bytes_to_g2)
+from common import bytes_from_hex, bytes_to_hex, hex_str
 
 # Types are aliased and specialised from py_ecc
 # so that the methods work as expected
@@ -17,9 +18,10 @@ G1Point = Optional[Tuple[FQ, FQ, FQ]]
 G2Point = Optional[Tuple[FQ2, FQ2, FQ2]]
 GT = FQ12
 
+# Re-exports
 G1Generator = G1Generator
 G2Generator = G2Generator
-
+#
 compressed_bytes_to_g1 = compressed_bytes_to_g1
 compressed_g1_to_bytes = compressed_g1_to_bytes
 compressed_bytes_to_g2 = compressed_bytes_to_g2
@@ -61,6 +63,24 @@ def multiply_g1(point: G1Point, private_key: PrivateKey):
 
 def multiply_g2(point: G2Point, private_key: PrivateKey):
     return multiply(point, private_key.scalar)
+
+
+def hex_str_to_g1(string: hex_str):
+    serialised_point = bytes_from_hex(string)
+    return compressed_bytes_to_g1(serialised_point)
+
+
+def g1_to_hex_str(point: G1Point):
+    return bytes_to_hex(compressed_g1_to_bytes(point))
+
+
+def g2_to_hex_str(point: G2Point):
+    return bytes_to_hex(compressed_g2_to_bytes(point))
+
+
+def hex_str_to_g2(string: hex_str):
+    serialised_point = bytes_from_hex(string)
+    return compressed_bytes_to_g2(serialised_point)
 
 
 @ dataclass
