@@ -25,11 +25,6 @@ compressed_g1_to_bytes = compressed_g1_to_bytes
 compressed_bytes_to_g2 = compressed_bytes_to_g2
 compressed_g2_to_bytes = compressed_g2_to_bytes
 
-# When we serialise a G1 or G2 points, these constants represent
-# their serialised size
-SERIALISED_G1_BYTES_SIZE = 48
-SERIALISED_G2_BYTES_SIZE = 96
-
 
 def is_identity(point: G1Point) -> bool:
     return is_inf(point)
