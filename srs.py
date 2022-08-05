@@ -101,7 +101,7 @@ class SRS:
     def copy(self):
         return deepcopy(self)
 
-    def from_hex_strings(param: SRSParameters, serialised_srs: Tuple[G1Powers, G2Powers]) -> SRS:
+    def __from_hex_strings(param: SRSParameters, serialised_srs: Tuple[G1Powers, G2Powers]) -> SRS:
         g1_points = []
         g2_points = []
 
@@ -125,7 +125,7 @@ class SRS:
 
         return SRS(param, g1_points, g2_points)
 
-    def to_hex_strings(self) -> Tuple[G1Powers, G2Powers]:
+    def __to_hex_strings(self) -> Tuple[G1Powers, G2Powers]:
         g1_powers = []
         g2_powers = []
 
@@ -141,7 +141,7 @@ class SRS:
     def serialise(self) -> SerialisedSRS:
         num_g1_points = self.num_g1_points()
         num_g2_points = self.num_g2_points()
-        g1_powers, g2_powers = self.to_hex_strings()
+        g1_powers, g2_powers = self.__to_hex_strings()
 
         return SerialisedSRS(num_g1_points, num_g2_points, g1_powers, g2_powers)
 
@@ -151,7 +151,7 @@ class SRS:
         if param.num_g2_points_needed != serialised_srs.num_g2_points:
             return None
         powers = [serialised_srs.g1_points, serialised_srs.g2_points]
-        return SRS.from_hex_strings(param, powers)
+        return SRS.__from_hex_strings(param, powers)
 
     # Check if the SRS passes our correctness checks:
     # - The first element should not be the identity point
