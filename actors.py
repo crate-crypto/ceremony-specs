@@ -90,20 +90,14 @@ class Verifier:
     def verify_ceremony(self):
         return SRS.verify_updates(self.starting_srs, self.ending_srs, self.update_proofs)
 
-    # If the contributor was found, then we return their position
-    # in the ceremony
-    # We return None, if the contributor was not found or
-    # if the ceremony was not valid
-    def find_contribution(self, key: PublicKey) -> Optional[int]:
-        if self.verify_ceremony() == False:
-            return None
-        return self.__find_contribution_no_verify(key)
+    def find_contribution_no_verify(self, key: PublicKey) -> Optional[int]:
+        return Verifier.find_public_key_in_update_proofs(self.update_proofs, key)
 
-    def __find_contribution_no_verify(self, key: PublicKey) -> Optional[int]:
+    def find_public_key_in_update_proofs(update_proofs: UpdateProofs, key: PublicKey) -> Optional[int]:
         # Find the matching public key in the list of update proofs
-        num_updates = len(self.update_proofs)
+        num_updates = len(update_proofs)
         for i in range(num_updates):
-            proof = self.update_proofs[i]
+            proof = update_proofs[i]
             if g2_eq(key, proof.public_key):
                 return i
         return None

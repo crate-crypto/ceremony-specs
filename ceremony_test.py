@@ -73,14 +73,15 @@ class TestSimpleCeremony(unittest.TestCase):
 
         # One can also find which position they were in the ceremony
         for contributor_index in range(NUM_CONTRIBUTORS):
-            got_index = verifier.find_contribution(pub_keys[contributor_index])
+            got_index = verifier.find_contribution_no_verify(
+                pub_keys[contributor_index])
             self.assertEqual(got_index, contributor_index)
 
         # If a contributor did not contribute during the ceremony,
         # Then this function returns None
         unknown_contributor = new_contributor(
             parameters, ending_srs_serialised)
-        contributor_index = verifier.find_contribution(
+        contributor_index = verifier.find_contribution_no_verify(
             unknown_contributor.keypair.public_key)
         self.assertIsNone(contributor_index)
 
