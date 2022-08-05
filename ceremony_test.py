@@ -2,10 +2,10 @@ import random
 import unittest
 from keypair import KeyPair
 from actors import Coordinator, Contributor, Verifier, SRSParameters
-from srs import SERIALISED_SRS, SRS
+from srs import SerialisedSRS, SRS
 
 
-def new_contributor(params: SRSParameters, serialised_srs: SERIALISED_SRS) -> Contributor:
+def new_contributor(params: SRSParameters, serialised_srs: SerialisedSRS) -> Contributor:
     # Generate 64 random bytes.
     # Do not use this function in production.
     byts = random.randbytes(64)

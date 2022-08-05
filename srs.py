@@ -15,7 +15,7 @@ G2Powers = List[hex_str]
 
 
 @dataclass
-class SERIALISED_SRS:
+class SerialisedSRS:
     num_g1_points: int
     num_g2_points: int
 
@@ -138,14 +138,14 @@ class SRS:
 
         return [g1_powers, g2_powers]
 
-    def serialise(self) -> SERIALISED_SRS:
+    def serialise(self) -> SerialisedSRS:
         num_g1_points = self.num_g1_points()
         num_g2_points = self.num_g2_points()
         g1_powers, g2_powers = self.to_hex_strings()
 
-        return SERIALISED_SRS(num_g1_points, num_g2_points, g1_powers, g2_powers)
+        return SerialisedSRS(num_g1_points, num_g2_points, g1_powers, g2_powers)
 
-    def deserialise(param: SRSParameters, serialised_srs: SERIALISED_SRS):
+    def deserialise(param: SRSParameters, serialised_srs: SerialisedSRS):
         if param.num_g1_points_needed != serialised_srs.num_g1_points:
             return None
         if param.num_g2_points_needed != serialised_srs.num_g2_points:
