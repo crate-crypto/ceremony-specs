@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 from py_ecc.optimized_bls12_381 import (
-    G1 as G1Generator, G2 as G2Generator, FQ, FQ2, curve_order, multiply, is_inf, is_on_curve, optimized_pairing)
+    G1 as G1Generator, G2 as G2Generator, FQ, FQ2, FQ12, curve_order, multiply, is_inf, is_on_curve, optimized_pairing, eq)
 from py_ecc.bls.g2_primatives import (G1_to_pubkey as compressed_g1_to_bytes,
                                       pubkey_to_G1 as compressed_bytes_to_g1, G2_to_signature as compressed_g2_to_bytes, signature_to_G2 as compressed_bytes_to_g2)
 
@@ -15,6 +15,7 @@ from py_ecc.bls.g2_primatives import (G1_to_pubkey as compressed_g1_to_bytes,
 # None signifies the identity point
 G1Point = Optional[Tuple[FQ, FQ, FQ]]
 G2Point = Optional[Tuple[FQ2, FQ2, FQ2]]
+GT = FQ12
 
 G1Generator = G1Generator
 G2Generator = G2Generator
@@ -32,6 +33,18 @@ SERIALISED_G2_BYTES_SIZE = 96
 
 def is_identity(point: G1Point) -> bool:
     return is_inf(point)
+
+
+def g1_eq(lhs: G1Point, rhs: G1Point):
+    return eq(lhs, rhs)
+
+
+def g2_eq(lhs: G2Point, rhs: G2Point):
+    return eq(lhs, rhs)
+
+
+def gt_eq(lhs: FQ12, rhs: FQ12):
+    return lhs == rhs
 
 
 def pairing(g1: G1Point, g2: G2Point):
