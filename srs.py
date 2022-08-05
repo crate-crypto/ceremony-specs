@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from bls import (G1Point, G2Point, g1_eq, gt_eq, is_identity, is_in_subgroup,  multiply_g1, multiply_g2, pairing,
                  compressed_bytes_to_g1, compressed_bytes_to_g2, compressed_g1_to_bytes, compressed_g2_to_bytes, G1Generator, G2Generator)
-from common import pairwise, hex_str
+from common import bytes_to_hex, pairwise, hex_str, bytes_from_hex
 from keypair import KeyPair
 from srs_updates import UpdateProof, UpdateProofs
 
@@ -97,12 +97,12 @@ class SRS:
         g1_powers, g2_powers = serialised_srs
 
         for i in range(param.num_g1_points_needed):
-            serialised_point = bytes.fromhex(g1_powers[i])
+            serialised_point = bytes_from_hex(g1_powers[i])
             point = compressed_bytes_to_g1(serialised_point)
             g1_points.append(point)
 
         for i in range(param.num_g2_points_needed):
-            serialised_point = bytes.fromhex(g2_powers[i])
+            serialised_point = bytes_from_hex(g2_powers[i])
             point = compressed_bytes_to_g2(serialised_point)
             g2_points.append(point)
 
@@ -119,10 +119,10 @@ class SRS:
         g2_powers = []
 
         for point in self.g1_points:
-            hex_str = compressed_g1_to_bytes(point).hex()
+            hex_str = bytes_to_hex(compressed_g1_to_bytes(point))
             g1_powers.append(hex_str)
         for point in self.g2_points:
-            hex_str = compressed_g2_to_bytes(point).hex()
+            hex_str = bytes_to_hex(compressed_g2_to_bytes(point))
             g2_powers.append(hex_str)
 
         return [g1_powers, g2_powers]
