@@ -29,6 +29,10 @@ class UpdateProof:
         product_proof = ProductDecompositionProof(starting_point)
 
         for proof in proofs:
-            product_proof.extend(proof.after_degree_1_point, proof.public_key)
+            product_proof.extend(proof.after_degree_1_point,
+                                 proof.public_key.point)
 
         return product_proof.verify()
+
+
+UpdateProofs = List[UpdateProof]
