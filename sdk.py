@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import List, Tuple
-from actors import Contributor
+from typing import List, Optional, Tuple
+from actors import Contributor, Verifier
+from bls import PublicKey
 from keypair import KeyPair
 from srs import SRS, G1Powers, G2Powers, SRSParameters
 from srs_updates import UpdateProof, UpdateProofs
@@ -44,6 +45,10 @@ class Transcript:
     # It will fail
     sub_ceremonies: Tuple[Ceremony, Ceremony, Ceremony, Ceremony]
 
+    def copy(self):
+        from copy import deepcopy
+        return deepcopy(self)
+
 
 # Since we changed the specs, the transcript does not contain the update proofs, so we return it when we
 # update the transcript
@@ -82,6 +87,9 @@ def update_transcript(transcript: Transcript, secrets: List[hex_str]) -> Tuple[T
     #     if contributor.all_elements_in_correct_subgroup() == False:
     #         return None
 
+    # Update the old transcript in place
+    for (contributor, ceremony) in zip(contributors, transcript.sub_ceremonies):
+        ceremony.powers_of_tau = contributor.serialise_srs()
     return (transcript, update_proofs)
 
 
@@ -94,3 +102,36 @@ def transcript_subgroup_check(transcript: Transcript) -> bool:
             return False
 
     return True
+
+
+def verify_ceremonies(starting_transcript: Transcript, ending_transcript: Transcript, ceremonies_update_proofs: List[UpdateProofs]) -> bool:
+
+    for i in range(NUM_OF_CEREMONIES):
+        starting_srs = starting_transcript.sub_ceremonies[i]
+        ending_srs = ending_transcript.sub_ceremonies[i]
+
+        update_proofs = ceremonies_update_proofs[i]
+        params = SRSParameters(starting_srs.num_g1_powers,
+                               starting_srs.num_g2_powers)
+
+        verifier = Verifier(params, starting_srs.powers_of_tau,
+                            ending_srs.powers_of_tau, update_proofs)
+        if verifier.verify_ceremony() == False:
+            return False
+
+    return True
+
+
+# This function assumes that the ceremony has been verified
+# Note: The position _should_ be the same for a contributor across ceremonies.
+# We could stop once we find the position in one ceremony, however this is an unnecessary optimisation
+def find_contributions_no_verify(ceremony_update_proofs: List[UpdateProofs], pubkeys: List[PublicKey]) -> List[Optional[int]]:
+    assert len(ceremony_update_proofs) == len(pubkeys)
+    assert len(ceremony_update_proofs) == NUM_OF_CEREMONIES
+
+    positions = []
+    for (pubkey, proofs) in zip(pubkeys, ceremony_update_proofs):
+        position = Verifier.find_public_key_in_update_proofs(proofs, pubkey)
+        positions.append(position)
+
+    return positions
