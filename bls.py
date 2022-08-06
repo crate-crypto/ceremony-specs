@@ -48,11 +48,11 @@ def pairing(g1: G1Point, g2: G2Point):
     return optimized_pairing.pairing(g2, g1)
 
 
-def is_in_g1(point: Union[G1Point, G2Point]):
+def is_in_g1(point: G1Point):
     return is_on_curve(point, b)
 
 
-def is_in_g2(point: Union[G1Point, G2Point]):
+def is_in_g2(point: G2Point):
     return is_on_curve(point, b2)
 
 
