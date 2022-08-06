@@ -68,6 +68,7 @@ def update_transcript(transcript: Transcript, secrets: List[hex_str]) -> Tuple[T
     update_proofs: List[UpdateProof] = []
     for contributor in contributors:
         proof = contributor.update_srs()
+        contributor.keypair.destroy()
         update_proofs.append(proof)
 
     # # Perform checks -- Since we are using optimistic contribution.
