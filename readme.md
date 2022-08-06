@@ -2,10 +2,9 @@
 
 ## Introduction
 
-For EIP-4844, Ethereum needs four different Structured Reference Strings (SRS). Each SRS has a secret/private key associated with it. For security, the SRS must be computed in such a way that no single person knows the secret associated with it. The solution is to have multiple people contribute to the secret. If all of these people collude, then they can recover the secret. If even one person does not collude, then nobody can recover the secret.
+To understand how the ceremony works at a high level, one can check out `ceremony_test.py` and `actors.py`.
 
-The process of multiple people contributing to the secret is known as the ceremony. This reference implementation will detail the algorithms needed to perform one ceremony. In order to generate four SRS's we need four ceremonies. A higher level protocol should call this library four times with different parameters to emulate this. 
-The reason we do this is to simplify the cryptography code needed.
+To understand what API should be implemented for the specs, see `sdk.py`
 
 ### FAQ
 
