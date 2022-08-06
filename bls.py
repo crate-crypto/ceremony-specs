@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 from py_ecc.optimized_bls12_381 import (
-    G1 as G1Generator, G2 as G2Generator, FQ, FQ2, FQ12, curve_order, multiply, is_inf, is_on_curve, optimized_pairing, eq)
+    G1 as G1Generator, G2 as G2Generator, FQ, FQ2, FQ12, curve_order, multiply, is_inf, is_on_curve, optimized_pairing, eq, b, b2)
 from py_ecc.bls.g2_primatives import (G1_to_pubkey as compressed_g1_to_bytes,
                                       pubkey_to_G1 as compressed_bytes_to_g1, G2_to_signature as compressed_g2_to_bytes, signature_to_G2 as compressed_bytes_to_g2)
 from common import bytes_from_hex, bytes_to_hex, hex_str
@@ -48,8 +48,12 @@ def pairing(g1: G1Point, g2: G2Point):
     return optimized_pairing.pairing(g2, g1)
 
 
-def is_in_group(point: Union[G1Point, G2Point]):
-    return is_on_curve(point)
+def is_in_g1(point: Union[G1Point, G2Point]):
+    return is_on_curve(point, b)
+
+
+def is_in_g2(point: Union[G1Point, G2Point]):
+    return is_on_curve(point, b2)
 
 
 # slow way to check if a point is in the subgroup

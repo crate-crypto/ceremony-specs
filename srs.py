@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Tuple
 from copy import deepcopy
 
-from bls import (G1Point, G2Point, g1_eq, g1_to_hex_str, g2_to_hex_str, gt_eq, hex_str_to_g1, hex_str_to_g2, is_identity, is_in_subgroup,  multiply_g1, multiply_g2, pairing,
+from bls import (G1Point, G2Point, g1_eq, g1_to_hex_str, g2_to_hex_str, gt_eq, hex_str_to_g1, hex_str_to_g2, is_identity, is_in_g1, is_in_g2, is_in_subgroup,  multiply_g1, multiply_g2, pairing,
                  G1Generator, G2Generator)
 from common import pairwise, hex_str
 from keypair import KeyPair
@@ -250,9 +250,13 @@ class SRS:
 
     def subgroup_checks(self):
         for point in self.g1_points:
+            if is_in_g1(point) == False:
+                return False
             if is_in_subgroup(point) == False:
                 return False
         for point in self.g2_points:
+            if is_in_g2(point) == False:
+                return False
             if is_in_subgroup(point) == False:
                 return False
 
