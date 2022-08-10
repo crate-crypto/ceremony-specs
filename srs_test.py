@@ -1,5 +1,5 @@
 import unittest
-from bls import is_identity, compressed_g1_to_bytes, compressed_g2_to_bytes
+from bls import is_identity, compressed_g1_to_bytes, compressed_g2_to_bytes, G1Generator
 from keypair import KeyPair
 from srs import SRS, SRSParameters
 
@@ -26,7 +26,7 @@ class TestSRS(unittest.TestCase):
 
         update_proof = srs.update(keys)
 
-        self.assertEqual(update_proof.before_degree_1_point,
+        self.assertEqual(G1Generator,
                          update_proof.after_degree_1_point)
 
     def test_zero_update__not_allowed(self):

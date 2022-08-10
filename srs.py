@@ -79,7 +79,6 @@ class SRS:
         num_g2_points = len(self.g2_points)
 
         private_key = keypair.private_key
-        before_degree_1_point = self.__degree_1_g1()
 
         for i in range(num_g1_points):
             priv_key_i = private_key.pow_i(i)
@@ -91,8 +90,7 @@ class SRS:
 
         after_degree_1_point = self.__degree_1_g1()
 
-        return UpdateProof(keypair.public_key, before_degree_1_point,
-                           after_degree_1_point)
+        return UpdateProof(keypair.public_key, after_degree_1_point)
 
     # Returns the G1 degree 0 element of the SRS
     def __degree_0_g1(self):
@@ -190,18 +188,14 @@ class SRS:
         if len(before_srs.g2_points) != len(after_srs.g2_points):
             return False
 
-        # 1) First lets check that the update proofs are indeed linked to the SRS that are given
-        #
-        first_update = update_proofs[0]
+        # 1) First lets check that the last SRS is linked with the last update proof
         last_update = update_proofs[-1]
 
-        if g1_eq(before_srs.__degree_1_g1(), first_update.before_degree_1_point) == False:
-            return False
         if g1_eq(after_srs.__degree_1_g1(), last_update.after_degree_1_point) == False:
             return False
 
         # 2) Check that the update proofs are correctly linked together
-        if UpdateProof.verify_chain(update_proofs) == False:
+        if UpdateProof.verify_chain(before_srs.__degree_1_g1(), update_proofs) == False:
             return False
 
         # 3) Check that the final SRS is correct.

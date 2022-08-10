@@ -13,18 +13,13 @@ class UpdateProof:
     # private key that made the update
     public_key: PublicKey
     # This is the degree-1 element of the SRS
-    # before the update was made
-    before_degree_1_point: G1Point
-    # This is the degree-1 element of the SRS
     # after the update was made
     after_degree_1_point: G1Point
 
     # Verifies that a chain of update proofs are linked
     # using the product decomposition proof module
-    def verify_chain(proofs: List[UpdateProof]):
+    def verify_chain(starting_point: G1Point, proofs: List[UpdateProof]):
         assert(len(proofs) > 0)
-
-        starting_point = proofs[0].before_degree_1_point
 
         product_proof = ProductDecompositionProof(starting_point)
 
